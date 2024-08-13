@@ -1,9 +1,11 @@
 package testastra;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletionStage;
 
 public class TestAstra {
 
@@ -32,7 +34,27 @@ public class TestAstra {
                     ResultSet rs3 = session.execute("SELECT toUnixTimestamp(now()) FROM system.local;");
                     Row row3 = rs3.one();
                     System.out.println(row3.getLong(0));
-
         	}
+        
+	        // Async
+	        CompletionStage<CqlSession> sessionStage = CqlSession.builder()
+	                .withCloudSecureConnectBundle(Paths.get(secureConnectBundlePath))
+	                .withAuthCredentials(username,password)
+	                .withKeyspace("system")
+	                .buildAsync();
+	        
+	        CompletionStage<AsyncResultSet> result = sessionStage.thenCompose(
+	        		session -> session.executeAsync("SELECT toUnixTimestamp(now()) FROM system.local;"));
+	        
+	        CompletionStage<Long> unixTimeResult = result.thenApply(resultSet -> resultSet.one().getLong(0));
+	
+	        unixTimeResult.whenComplete(
+	        		(unixtime, error) -> {
+	        			if (error != null) {
+	        				System.out.println(error);
+	        			} else {
+	        				System.out.println(unixtime);
+	        			}
+	        		});
         }
 }
