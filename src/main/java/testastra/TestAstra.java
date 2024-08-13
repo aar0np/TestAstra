@@ -36,25 +36,25 @@ public class TestAstra {
                     System.out.println(row3.getLong(0));
         	}
         
-	        // Async
-	        CompletionStage<CqlSession> sessionStage = CqlSession.builder()
-	                .withCloudSecureConnectBundle(Paths.get(secureConnectBundlePath))
-	                .withAuthCredentials(username,password)
-	                .withKeyspace("system")
-	                .buildAsync();
-	        
-	        CompletionStage<AsyncResultSet> result = sessionStage.thenCompose(
-	        		session -> session.executeAsync("SELECT toUnixTimestamp(now()) FROM system.local;"));
-	        
-	        CompletionStage<Long> unixTimeResult = result.thenApply(resultSet -> resultSet.one().getLong(0));
-	
-	        unixTimeResult.whenComplete(
-	        		(unixtime, error) -> {
-	        			if (error != null) {
-	        				System.out.println(error);
-	        			} else {
-	        				System.out.println(unixtime);
-	        			}
-	        		});
-        }
+        // Async
+        CompletionStage<CqlSession> sessionStage = CqlSession.builder()
+                .withCloudSecureConnectBundle(Paths.get(secureConnectBundlePath))
+                .withAuthCredentials(username,password)
+                .withKeyspace("system")
+                .buildAsync();
+        
+        CompletionStage<AsyncResultSet> result = sessionStage.thenCompose(
+        		session -> session.executeAsync("SELECT toUnixTimestamp(now()) FROM system.local;"));
+        
+        CompletionStage<Long> unixTimeResult = result.thenApply(resultSet -> resultSet.one().getLong(0));
+
+        unixTimeResult.whenComplete(
+        		(unixtime, error) -> {
+        			if (error != null) {
+        				System.out.println(error);
+        			} else {
+        				System.out.println(unixtime);
+        			}
+        		});
+    }
 }
