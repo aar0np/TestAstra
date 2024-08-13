@@ -9,7 +9,7 @@ import java.util.concurrent.CompletionStage;
 
 public class TestAstra {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
 		String username = System.getenv("CLIENT_ID");
 		String password = System.getenv("SECRET");
